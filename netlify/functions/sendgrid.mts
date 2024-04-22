@@ -38,6 +38,15 @@ const handler: Handler = async (
         body: JSON.stringify(emailData),
       };
 
+    case "DELETE":
+      await emailDB.push("/email", "");
+      return {
+        statusCode: 202,
+        body: JSON.stringify({
+          message: "Email deleted successfully.",
+        }),
+      };
+
     default:
       return {
         statusCode: 403,
