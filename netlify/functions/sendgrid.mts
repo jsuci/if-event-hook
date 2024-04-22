@@ -2,7 +2,7 @@ import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
 import JsonDBWrapper from "../../lib/db/json_db";
 import path = require("path");
 
-const emailDB = new JsonDBWrapper(path.join("public", "emails.json"));
+const emailDB = new JsonDBWrapper("emails.json");
 
 const handler: Handler = async (
   event: HandlerEvent,
