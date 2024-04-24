@@ -1,8 +1,5 @@
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
-import JsonDBWrapper from "../../lib/db/json_db";
-import path = require("path");
-
-const emailDB = new JsonDBWrapper("emails.json");
+import { getStore } from "@netlify/blobs";
 
 const handler: Handler = async (
   event: HandlerEvent,
@@ -14,9 +11,13 @@ const handler: Handler = async (
         const rawData = event.body?.trim();
         const eventData = JSON.parse(rawData || "[]");
 
-        await emailDB.push("/email", eventData);
+        const sendgrid = getStore("sendgrid");
 
-        console.log("Event Data Stored:", eventData);
+        await sendgrid.setJSON("email", eventData);
+
+        const email = await sendgrid.get("email");
+
+        console.log("Event Data Stored:", email);
         return {
           statusCode: 201,
           body: JSON.stringify({ message: "Success", data: eventData }),
@@ -32,14 +33,14 @@ const handler: Handler = async (
       }
 
     case "GET":
-      const emailData = await emailDB.get("/email");
+      const sendgrid = getStore("sendgrid");
+      const email = await sendgrid.get("email");
       return {
         statusCode: 200,
-        body: JSON.stringify(emailData),
+        body: JSON.stringify(email),
       };
 
     case "DELETE":
-      await emailDB.push("/email", "");
       return {
         statusCode: 202,
         body: JSON.stringify({
