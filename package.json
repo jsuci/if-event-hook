@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "astro dev",
+    "dev": "netlify dev",
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview"
@@ -15,6 +15,7 @@
     "astro": "^2.0.0"
   },
   "dependencies": {
+    "@netlify/blobs": "^7.3.0",
     "@netlify/functions": "^2.6.0",
     "node-json-db": "^2.3.0"
   }
