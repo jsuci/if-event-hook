@@ -1,6 +1,12 @@
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
 import { getStore } from "@netlify/blobs";
 
+const sendgrid = getStore({
+  name: "sendgrid",
+  siteID: "8265c3b5-c9da-4c35-9506-4b397bdf9821",
+  token: "nfp_zgsyJfwoH4pjhrTachdm5hnUXWWL4nsy4ade",
+});
+
 const handler: Handler = async (
   event: HandlerEvent,
   context: HandlerContext
@@ -11,16 +17,15 @@ const handler: Handler = async (
         const rawData = event.body?.trim();
         const eventData = JSON.parse(rawData || "[]");
 
-        const sendgrid = getStore("sendgrid");
-
         await sendgrid.setJSON("email", eventData);
 
         const email = await sendgrid.get("email");
 
         console.log("Event Data Stored:", email);
+
         return {
           statusCode: 201,
-          body: JSON.stringify({ message: "Success", data: eventData }),
+          body: JSON.stringify(email),
         };
       } catch (error) {
         console.error("Error parsing JSON or storing data:", error);
@@ -33,14 +38,17 @@ const handler: Handler = async (
       }
 
     case "GET":
-      const sendgrid = getStore("sendgrid");
-      const email = await sendgrid.get("email");
+      const emailRaw = await sendgrid.get("email");
+      const emailTrim = emailRaw?.trim();
+      const email = JSON.parse(emailTrim || "[]");
+
       return {
         statusCode: 200,
         body: JSON.stringify(email),
       };
 
     case "DELETE":
+      await sendgrid.setJSON("email", []);
       return {
         statusCode: 202,
         body: JSON.stringify({
